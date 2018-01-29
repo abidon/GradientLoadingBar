@@ -35,7 +35,8 @@ let gradientLoadingBar = GradientLoadingBar(
         UIColor(hex: "#4cd964"),
         UIColor(hex: "#ff2d55")
     ]
-    onView: self.view
+    onView: self.view,
+    position: .top
 )
 ```
 For using custom colors you'll have to pass an array with `UIColor` values. For creating those colors you can use all initializers for `UIColor` mentioned here: [UIColor+Initializers.swift](https://gist.github.com/fxm90/1350d27abf92af3be59aaa9eb72c9310)

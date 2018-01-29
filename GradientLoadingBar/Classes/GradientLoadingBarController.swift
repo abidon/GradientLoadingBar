@@ -13,6 +13,13 @@ import UIKit
 /// Typealias for controller to match pod name.
 public typealias GradientLoadingBar = GradientLoadingBarController
 
+// MARK: - Enumerations
+
+public enum GradientLoadingBarPosition {
+    case top
+    case bottom
+}
+
 // MARK: - Controller
 
 open class GradientLoadingBarController {
@@ -56,6 +63,9 @@ open class GradientLoadingBarController {
     /// Superview that the gradient view is attached to.
     public private(set) var superview: UIView?
 
+    /// Where the gradient view should be attached on its superview.
+    public private(set) var position: GradientLoadingBarPosition
+
     /// Singleton instance.
     public static var shared: GradientLoadingBar = GradientLoadingBar()
 
@@ -79,9 +89,11 @@ open class GradientLoadingBarController {
         height: Double = DefaultValues.height,
         durations: Durations = DefaultValues.durations,
         gradientColorList: [UIColor] = DefaultValues.gradientColors,
-        onView superview: UIView? = nil
+        onView superview: UIView? = nil,
+        position: GradientLoadingBarPosition = .top
     ) {
         self.height = height
+        self.position = position
 
         gradientView = GradientView(
             animationDurations: durations,
@@ -124,13 +136,31 @@ open class GradientLoadingBarController {
         let superViewTopAnchor: NSLayoutYAxisAnchor
         if #available(iOS 11.0, *) {
             // Handle iPhone X Layout, so gradient view is underneath the status bar
-            superViewTopAnchor = superview.safeAreaLayoutGuide.topAnchor
+            switch position {
+            case .top:
+                superViewTopAnchor = superview.safeAreaLayoutGuide.topAnchor
+            case .bottom:
+                superViewTopAnchor = superview.safeAreaLayoutGuide.bottomAnchor
+            }
         } else {
-            superViewTopAnchor = superview.topAnchor
+            switch position {
+            case .top:
+                superViewTopAnchor = superview.topAnchor
+            case .bottom:
+                superViewTopAnchor = superview.bottomAnchor
+            }
+        }
+
+        let yAxisAnchor: NSLayoutYAxisAnchor
+        switch position {
+        case .top:
+            yAxisAnchor = gradientView.topAnchor
+        case .bottom:
+            yAxisAnchor = gradientView.bottomAnchor
         }
 
         NSLayoutConstraint.activate([
-            gradientView.topAnchor.constraint(equalTo: superViewTopAnchor),
+            yAxisAnchor.constraint(equalTo: superViewTopAnchor),
             gradientView.heightAnchor.constraint(equalToConstant: CGFloat(height)),
 
             gradientView.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
